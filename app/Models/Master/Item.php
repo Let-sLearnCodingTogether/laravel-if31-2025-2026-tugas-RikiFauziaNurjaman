@@ -19,8 +19,14 @@ class Item extends Model
         'user_id'
     ];
 
+    protected $casts = [
+        'purchase_date' => 'date',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+
 }

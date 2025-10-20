@@ -8,8 +8,8 @@ use App\Http\Requests\Master\UpdateRequest;
 use App\Models\Master\Item;
 use App\Models\User;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ItemController extends Controller
 {
@@ -19,9 +19,9 @@ class ItemController extends Controller
             $user = Auth::user();
 
             if ($user->role === 'admin') {
-                $data = User::with('items')->get();
+                $data = Item::with('user:id,name,email')->get();
             } else {
-                $data = $user->items;
+                $data = $user->items()->get();
             }
             return response()->json([
                 'status' => 'sukses ambil data',
@@ -53,8 +53,11 @@ class ItemController extends Controller
                 'data' => $item
             ]);
 
-        } catch (\Thr) {
-            //throw $th;
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'gagal tambah data',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
