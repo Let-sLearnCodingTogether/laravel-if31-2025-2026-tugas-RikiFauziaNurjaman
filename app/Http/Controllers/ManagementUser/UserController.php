@@ -27,14 +27,28 @@ class UserController extends Controller
         }
     }
 
+    public function profile(Request $request) {
+        try {
+            $user = $request->user();
+            return response()->json([
+                'user' => $user
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Gagal mengambil data user',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function updateUser(Request $request)
     {
         try {
             $user = Auth::user();
 
             $validated = $request->validate([
-                'name' => 'required|min:3|max:255',
-                'email' => 'required|email|unique:users,email'
+                'name' => 'sometimes|min:3|max:255',
+                'email' => 'sometimes|email|unique:users,email'
             ]);
 
             $user->update($validated);

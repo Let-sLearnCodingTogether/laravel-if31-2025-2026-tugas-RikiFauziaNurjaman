@@ -17,6 +17,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('items', ItemController::class);
 
         Route::get('/user', [UserController::class, 'index']);
+        Route::get('/user/profile', [UserController::class, 'profile']);
         Route::put('/user/update', [UserController::class, 'updateUser']);
         Route::put('/user/updateAvatar', [UserController::class, 'updateAvatar']);
         Route::put('/user/updatePassword', [UserController::class, 'updatePassword']);
