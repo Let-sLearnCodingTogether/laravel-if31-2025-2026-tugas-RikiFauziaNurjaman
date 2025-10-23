@@ -27,6 +27,31 @@ class UserController extends Controller
         }
     }
 
+    public function updateUser(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            $validated = $request->validate([
+                'name' => 'required|min:3|max:255',
+                'email' => 'required|email|unique:users,email'
+            ]);
+
+            $user->update($validated);
+
+            return response()->json([
+                'message' => 'Data berhasil diperbarui',
+                'user' => $user
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Gagal memperbarui data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function updateAvatar(Request $request)
     {
         try {
@@ -49,36 +74,6 @@ class UserController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Gagal memperbarui avatar',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function switchRole(Request $request)
-    {
-        try {
-            if($request->user()->role !== 'admin')
-            {
-                return response()->json([
-                    'message' => 'Anda tidak memiliki akses untuk ubah role'
-                ], 403);
-            }
-
-            $request->validate([
-                'role' => 'required|in:admin,user',
-                'user_id' => 'required|exists:users,id',
-            ]);
-            $user = User::findOrFail($request->input('user_id'));
-            $user->role = $request->input('role');
-            $user->save();
-
-            return response()->json([
-                'message' => 'Role berhasil diperbarui',
-                'role' => $user->role
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Gagal memperbarui role',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -147,5 +142,36 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function switchRole(Request $request)
+    {
+        try {
+            if($request->user()->role !== 'admin')
+            {
+                return response()->json([
+                    'message' => 'Anda tidak memiliki akses untuk ubah role'
+                ], 403);
+            }
+
+            $request->validate([
+                'role' => 'required|in:admin,user',
+                'user_id' => 'required|exists:users,id',
+            ]);
+            $user = User::findOrFail($request->input('user_id'));
+            $user->role = $request->input('role');
+            $user->save();
+
+            return response()->json([
+                'message' => 'Role berhasil diperbarui',
+                'role' => $user->role
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Gagal memperbarui role',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
 }

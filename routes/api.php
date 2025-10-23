@@ -13,17 +13,17 @@ Route::post('login', [LoginController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('logout', [LoginController::class, 'logout']);
 
-    Route::apiResource('items', ItemController::class);
+    Route::middleware('role:admin,user')->group(function () {
+        Route::apiResource('items', ItemController::class);
 
-    Route::get('/user', [UserController::class, 'index']);
-    Route::put('/user/updateAvatar', [UserController::class, 'updateAvatar']);
-    Route::put('/user/switchRole', [UserController::class, 'switchRole']);
-    Route::put('/user/updatePassword', [UserController::class, 'updatePassword']);
-    Route::delete('/user/{id}', [UserController::class, 'destroy']);
+        Route::get('/user', [UserController::class, 'index']);
+        Route::put('/user/update', [UserController::class, 'updateUser']);
+        Route::put('/user/updateAvatar', [UserController::class, 'updateAvatar']);
+        Route::put('/user/updatePassword', [UserController::class, 'updatePassword']);
+    });
+
+    Route::middleware(['role:admin'])->group(function (){
+        Route::put('/user/switchRole', [UserController::class, 'switchRole']);
+        Route::delete('/user/{id}', [UserController::class, 'destroy']);
+    });
 });
-
-
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
